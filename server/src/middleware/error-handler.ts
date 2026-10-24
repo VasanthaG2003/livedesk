@@ -53,5 +53,13 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   if (status >= 500) {
     req.log.error({ err }, 'Unhandled error')
   }
+  // Errors raised before GraphQL runs (bad JSON, foreign Origin, rate limit…)
+  // use the GraphQL error shape on /graphql, so the client can show the message.
+  if (req.path.startsWith('/graphql')) {
+    res.status(status).json({
+      errors: [{ message: body.error.message, extensions: { code: body.error.code, status } }],
+    })
+    return
+  }
   res.status(status).json(body)
 }

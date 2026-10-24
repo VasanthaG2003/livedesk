@@ -48,6 +48,8 @@ describe('transport-level protection', () => {
       .set('Origin', 'https://evil.example')
       .send({ query: 'mutation { logout }' })
     expect(res.status).toBe(403)
+    // GraphQL-shaped, so the web client can display the reason.
+    expect(res.body.errors[0].extensions).toEqual({ code: 'BAD_ORIGIN', status: 403 })
   })
 
   it('sets helmet headers and hides X-Powered-By', async () => {
