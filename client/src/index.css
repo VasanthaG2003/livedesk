@@ -1,0 +1,71 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens taken from the LiveDesk reference design.
+ * Tailwind v4 turns each --color-* / --font-* variable into utilities
+ * (bg-brand-600, text-ink-500, border-line, bg-navy-900, …).
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Blue-indigo primary */
+  --color-brand-50: #eef1ff;
+  --color-brand-100: #e0e6ff;
+  --color-brand-200: #c6d0fe;
+  --color-brand-300: #a3b1fc;
+  --color-brand-400: #7b8cf7;
+  --color-brand-500: #5468ef;
+  --color-brand-600: #3e50e0;
+  --color-brand-700: #3140c4;
+  --color-brand-800: #2b379d;
+
+  /* Subtle purple accent */
+  --color-accent-100: #efe9ff;
+  --color-accent-500: #8b5cf6;
+
+  /* Deep navy sidebar (agent/admin) */
+  --color-navy-950: #0a1229;
+  --color-navy-900: #0f1a38;
+  --color-navy-800: #172447;
+  --color-navy-700: #22325c;
+  --color-navy-active: #1f3a8f;
+  --color-navy-text: #b9c3dc;
+
+  /* Neutrals */
+  --color-canvas: #f5f7fb;
+  --color-line: #e7ebf3;
+  --color-line-strong: #d5dbe7;
+  --color-ink-900: #141b2d;
+  --color-ink-700: #2f384c;
+  --color-ink-500: #5d6679;
+  --color-ink-400: #8590a5;
+  --color-ink-300: #b2bacb;
+
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.04);
+  --shadow-pop: 0 10px 30px -10px rgb(16 24 40 / 0.2), 0 4px 10px -4px rgb(16 24 40 / 0.08);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-sm text-ink-900;
+  }
+
+  /* One consistent, clearly visible keyboard focus ring everywhere. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
