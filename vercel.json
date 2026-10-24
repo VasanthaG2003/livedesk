@@ -5,7 +5,7 @@
   "outputDirectory": "client/dist",
   "framework": null,
   "rewrites": [
-    { "source": "/graphql", "destination": "https://livedesk-api.onrender.com/graphql" },
+    { "source": "/graphql", "destination": "https://livedesk-api-bi6i.onrender.com/graphql" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
