@@ -1,0 +1,34 @@
+# Render Blueprint for the API (GraphQL over HTTP + WebSocket).
+# New → Blueprint → pick this repo. Values marked sync: false are asked for once.
+services:
+  - type: web
+    name: livedesk-api
+    runtime: node
+    plan: free
+    region: singapore
+    # --include=dev: the build needs esbuild/TypeScript even though NODE_ENV=production.
+    buildCommand: npm ci --include=dev && npm run build -w @livedesk/server
+    startCommand: npm run start -w @livedesk/server
+    healthCheckPath: /health/ready
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NODE_ENV
+        value: production
+      # Browser → Vercel → Render: two proxies in front of the app, so req.ip is the real client.
+      - key: TRUST_PROXY
+        value: '2'
+      - key: LOG_LEVEL
+        value: info
+      - key: MONGODB_URI
+        sync: false
+      # Your Vercel URL, e.g. https://livedesk.vercel.app (comma-separate several).
+      - key: CLIENT_ORIGINS
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_SOCKET_SECRET
+        generateValue: true
+      # Optional: enables AI assist. Leave empty to keep it off.
+      - key: ANTHROPIC_API_KEY
+        sync: false

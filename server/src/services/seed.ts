@@ -23,6 +23,20 @@ import { hashPassword } from './auth.service'
 
 export const DEMO_PASSWORD = 'Demo@12345'
 
+/**
+ * Passwords for seeded accounts. For a public demo database set SEED_PASSWORD
+ * (customers and agents) and SEED_ADMIN_PASSWORD (admin) instead of shipping
+ * the well-known development password.
+ */
+function seedPasswords() {
+  const shared = process.env.SEED_PASSWORD || DEMO_PASSWORD
+  const admin = process.env.SEED_ADMIN_PASSWORD || shared
+  for (const pw of [shared, admin]) {
+    if (pw.length < 8) throw new Error('Seed passwords must be at least 8 characters')
+  }
+  return { shared, admin }
+}
+
 const demoUsers: { key: string; name: string; email: string; role: Role }[] = [
   { key: 'vasantha', name: 'Vasantha G', email: 'customer@livedesk.dev', role: 'customer' },
   { key: 'rohan', name: 'Rohan S', email: 'rohan@livedesk.dev', role: 'customer' },
@@ -194,10 +208,18 @@ export async function seedDemoData(logger: Logger) {
     return
   }
 
-  const passwordHash = await hashPassword(DEMO_PASSWORD)
+  const passwords = seedPasswords()
+  const passwordHash = await hashPassword(passwords.shared)
+  const adminHash =
+    passwords.admin === passwords.shared ? passwordHash : await hashPassword(passwords.admin)
   const users = new Map<string, { _id: Types.ObjectId; name: string }>()
   for (const u of demoUsers) {
-    const doc = await UserModel.create({ name: u.name, email: u.email, role: u.role, passwordHash })
+    const doc = await UserModel.create({
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      passwordHash: u.role === 'admin' ? adminHash : passwordHash,
+    })
     users.set(u.key, doc)
   }
   const user = (key: string) => users.get(key)!
@@ -309,7 +331,7 @@ export async function seedDemoData(logger: Logger) {
   ])
 
   logger.info(
-    { accounts: demoUsers.map((u) => `${u.email} (${u.role})`), password: DEMO_PASSWORD },
+    { accounts: demoUsers.map((u) => `${u.email} (${u.role})`) },
     'Seeded development demo data',
   )
 }

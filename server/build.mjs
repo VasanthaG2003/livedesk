@@ -1,11 +1,18 @@
 // Bundles the server into dist/index.js with esbuild.
-// npm dependencies stay external (installed on the host as usual); the
-// @livedesk/shared workspace is TypeScript source, so it is bundled in.
+// Every npm package stays external (installed on the host as usual and loaded
+// from node_modules). Only our own @livedesk/* workspace code is bundled in,
+// because it's TypeScript source that Node can't run directly.
 import { build } from 'esbuild'
-import { readFileSync } from 'node:fs'
 
-const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
-const external = Object.keys(pkg.dependencies ?? {}).filter((name) => name !== '@livedesk/shared')
+/** Marks bare imports (npm packages) external, except our workspaces. */
+const externalPackages = {
+  name: 'external-packages',
+  setup(b) {
+    b.onResolve({ filter: /^[^./]/ }, (args) =>
+      args.path.startsWith('@livedesk/') ? undefined : { path: args.path, external: true },
+    )
+  },
+}
 
 await build({
   entryPoints: ['src/index.ts'],
@@ -15,6 +22,6 @@ await build({
   target: 'node22',
   format: 'esm',
   sourcemap: true,
-  external,
+  plugins: [externalPackages],
   logLevel: 'info',
 })
