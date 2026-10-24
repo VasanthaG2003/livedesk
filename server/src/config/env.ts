@@ -20,7 +20,8 @@ const envSchema = z
     JWT_ACCESS_SECRET: secret,
     JWT_SOCKET_SECRET: secret,
     // Optional. Without a key the AI assist features are switched off.
-    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    // Hosting dashboards often send an unset variable as "", so treat that as absent.
+    ANTHROPIC_API_KEY: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).optional()),
     AI_MODEL: z.string().min(1).default('claude-opus-5-5'),
     LOG_LEVEL: z
       .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
